@@ -1,15 +1,23 @@
 class SessionsController < ApplicationController
-  layout false
+  # layout false
   # skip_before_action :verify_authenticity_token
  
   def google
-    # render plain: "Hi, We Are Here"
+    render plain: "Hi, We Are Here"
     # render 'sessions/new.html.erb'
-    redirect_to "http://aee5a30f.ngrok.io/auth/google_oauth2"
+    # redirect_to "http://aee5a30f.ngrok.io/auth/google_oauth2"
   end
 
   def create
     @auth = request.env['omniauth.auth']['credentials']
+    email = request.env['omniauth.auth'].info.email
+    byebug
+    Token.create(
+      access_token: @auth['token'],
+      refresh_token: @auth['refresh_token'],
+      email: email,
+      expires_at: Time.at(@auth['expires_at']).to_datetime)
+    render plain: "head back to the other tab"
   end
  
   
