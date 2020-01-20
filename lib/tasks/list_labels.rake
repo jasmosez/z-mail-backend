@@ -1,12 +1,17 @@
 require 'pp'
 task :list_labels => :environment do
-  client = Google::Apis::GmailV1::GmailService.new
+  
+  # Initialize the API
+  service = Google::Apis::GmailV1::GmailService.new
+  # service.client_options.application_name = APPLICATION_NAME
+  service.authorization = Token.last.fresh_token
+  
+  # Show the user's labels
+  user_id = "me"
+  result = service.list_user_labels user_id
   byebug
-  client.authorization.access_token = Token.last.fresh_token
-  service = client.discovered_api('gmail')
-  result = client.execute(
-    :api_method => service.users.labels.list,
-    :parameters => {'userId' => 'me'},
-    :headers => {'Content-Type' => 'application/json'})
-  pp JSON.parse(result.body)
+  puts "Labels:"
+  puts "No labels found" if result.labels.empty?
+  result.labels.each { |label| puts "- #{label.name}" }
+
 end
