@@ -13,8 +13,8 @@ task :get_messages => :environment do
   # call to get messages. 100 per page
   result = service.list_user_messages(user_id)
   result.messages.each { |message| 
-    message = service.get_user_message(user_id, message.id)
-    # byebug
+  message = service.get_user_message(user_id, message.id, format: 'metadata')
+  # byebug
 
     # date
     secs = message.internal_date/1000

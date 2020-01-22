@@ -10,17 +10,30 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_19_053414) do
+ActiveRecord::Schema.define(version: 2020_01_21_203537) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "api_v1_users", force: :cascade do |t|
-    t.string "email"
-    t.string "google_token"
-    t.string "google_refresh_token"
+  create_table "labels", force: :cascade do |t|
+    t.string "google_id"
+    t.string "name"
+    t.bigint "message_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["message_id"], name: "index_labels_on_message_id"
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.bigint "token_id", null: false
+    t.datetime "date"
+    t.string "google_id"
+    t.string "subject"
+    t.string "from"
+    t.string "snippet"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["token_id"], name: "index_messages_on_token_id"
   end
 
   create_table "tokens", force: :cascade do |t|
@@ -32,4 +45,6 @@ ActiveRecord::Schema.define(version: 2020_01_19_053414) do
     t.string "email"
   end
 
+  add_foreign_key "labels", "messages"
+  add_foreign_key "messages", "tokens"
 end

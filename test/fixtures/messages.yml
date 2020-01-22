@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  token: one
+  date: 2020-01-21 15:34:13
+  google_id: 1
+  subject: MyString
+  from: MyString
+  label: 
+  snippet: MyString
+
+two:
+  token: two
+  date: 2020-01-21 15:34:13
+  google_id: 1
+  subject: MyString
+  from: MyString
+  label: 
+  snippet: MyString
