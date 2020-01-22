@@ -1,8 +1,7 @@
 class MessagesController < ApplicationController
 
   def index
-    Token.get_messages
-    messages = Message.all
+    messages = current_user.get_messages
     render json: messages
   end
 
