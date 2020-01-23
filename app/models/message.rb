@@ -15,7 +15,7 @@ class Message
     @subject = attributes[:subject]
     @from = attributes[:from]
     @snippet = attributes[:snippet]
-    @labels = self.label_names
+    @labels = self.label_names.uniq
 
     @@all << self
   end

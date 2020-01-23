@@ -49,8 +49,6 @@ task :get_messages => :environment do
             from = from_header.value
             
             # labels
-            # in/out. Out is determined by having "SENT" within label_ids. In is everything that is not out.
-            # inbox? determined by having "INBOX" within label_ids
             label_ids = res.label_ids
             
             # description
