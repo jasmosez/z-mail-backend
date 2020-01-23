@@ -10,11 +10,6 @@ task :get_messages => :environment do
   service.authorization = Token.last.fresh_token
   user_id = "me"
 
-  # array of hashes that we will pass to the front end via its fetch request
-  dataObj = []
-
-  # call to get messages. 100 per page
-  # result = service.list_user_messages(user_id, q: "after:2020/1/15 before:2020/1/30")
   next_page = nil
   # ids = []
   error_counter = 0
@@ -61,13 +56,13 @@ task :get_messages => :environment do
             # description
             snippet = res.snippet
 
-            # puts "id: #{id}"
-            # puts "date: #{date}"
-            # puts "subject: #{subject}"
-            # puts "from: #{from}"
-            # puts "label_ids: #{label_ids}"
-            # puts "snippet: #{snippet}"
-            # puts "--------------------------------------------"
+            puts "id: #{id}"
+            puts "date: #{date}"
+            puts "subject: #{subject}"
+            puts "from: #{from}"
+            puts "label_ids: #{label_ids}"
+            puts "snippet: #{snippet}"
+            puts "--------------------------------------------"
             
             result_counter += 1
           end

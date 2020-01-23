@@ -1,6 +1,5 @@
 class SessionsController < ApplicationController
   # layout false
-  # skip_before_action :verify_authenticity_token
 
   def create
     # use authenticated email to check if we have a Token for that address
@@ -17,14 +16,16 @@ class SessionsController < ApplicationController
         expires_at: Time.at(@auth['expires_at']).to_datetime
       )
     end
-      
+    
+    byebug
     # set the current user to the found or newly created Token id
-    session[:current_user_id] = user.id
-    render plain: "You're all logged in and can close this tab."
+    
+    user.login
+    render plain: "You're all logged in and can close this tab. Current User: #{current_user.email}"
   end
 
   def destroy
-    session[:current_user_id] = ""
+    Token.clear_logins
   end
 
 
