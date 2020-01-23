@@ -4,6 +4,14 @@ require 'json'
 class Token < ApplicationRecord
   # has_many :messages
 
+  def daysago(num)
+    (DateTime.now - num).strftime("%Y/%-m/%-d")
+  end
+
+  def after_date
+    daysago(30)
+  end
+
   def to_params
     {'refresh_token' => refresh_token,
     'client_id' => ENV['GOOGLE_CLIENT_ID'],
@@ -35,7 +43,6 @@ class Token < ApplicationRecord
   def login
     Token.clear_logins
     self.update(loggedin: true)
-    byebug
   end
 
   def get_messages
@@ -48,14 +55,15 @@ class Token < ApplicationRecord
     service.authorization = self.fresh_token
     user_id = "me"
 
-    next_page = nil
     message_hashes = []
+    next_page = nil
     error_counter = 0
     result_counter = 0
+    error_ids = []
 
     begin
       puts "Fetching page of emails"
-      result = service.list_user_messages(user_id, max_results: 500, page_token: next_page, q: "after:2019/12/22")
+      result = service.list_user_messages(user_id, max_results: 500, page_token: next_page, q: "after:#{after_date}")
 
       # gather ID's for a batch
       ids = result.messages.map do |message| 
@@ -68,6 +76,7 @@ class Token < ApplicationRecord
             if err
               # Handle error
               # puts "Error"
+              error_ids << id
               error_counter += 1
             else
               # call to get messages. 100 per page
@@ -84,8 +93,11 @@ class Token < ApplicationRecord
     t2 = Time.now
     delta = t2 - t1 
 
-    puts "#{result_counter} results"
+
+    
+    puts error_ids
     puts "#{error_counter} errors"
+    puts "#{result_counter} results"
     puts "#{delta} sec"
 
     message_hashes.map do |hash|
@@ -99,5 +111,7 @@ class Token < ApplicationRecord
       token.update(loggedin: nil)
     end
   end
+
+  
 
 end # class Token
