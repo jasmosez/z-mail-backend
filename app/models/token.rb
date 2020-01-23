@@ -32,20 +32,72 @@ class Token < ApplicationRecord
     access_token
   end 
 
+  def login
+    Token.clear_logins
+    self.update(loggedin: true)
+    byebug
+  end
+
   def get_messages
+    puts "here we go"
+    t1 = Time.now
+
     # Initialize the API
     service = Google::Apis::GmailV1::GmailService.new
     # service.client_options.application_name = APPLICATION_NAME
     service.authorization = self.fresh_token
     user_id = "me"
 
-    # call to get messages. 100 per page
-    result = service.list_user_messages(user_id)
-    new_messages = result.messages.map do |message| 
-      message = service.get_user_message(user_id, message.id, format: 'metadata')      
-      new_message_hash = Message.make_message_hash(message, self)
-      Message.new(new_message_hash)
+    next_page = nil
+    message_hashes = []
+    error_counter = 0
+    result_counter = 0
+
+    begin
+      puts "Fetching page of emails"
+      result = service.list_user_messages(user_id, max_results: 500, page_token: next_page, q: "after:2019/12/22")
+
+      # gather ID's for a batch
+      ids = result.messages.map do |message| 
+        message.id
+      end
+
+      service.batch do |service|
+        ids.each do |id|
+          service.get_user_message(user_id, id, format: 'metadata') do |res, err|
+            if err
+              # Handle error
+              # puts "Error"
+              error_counter += 1
+            else
+              # call to get messages. 100 per page
+              message_hashes << Message.make_message_hash(res, self)
+              result_counter += 1
+            end
+          end
+        end
+      end # service.batch
+      
+      next_page = result.next_page_token
+    end while next_page
+
+    t2 = Time.now
+    delta = t2 - t1 
+
+    puts "#{result_counter} results"
+    puts "#{error_counter} errors"
+    puts "#{delta} sec"
+
+    message_hashes.map do |hash|
+      Message.new(hash)
+    end
+
+  end # def get_messages
+
+  def self.clear_logins
+    Token.all.each do |token|
+      token.update(loggedin: nil)
     end
   end
 
-end
+end # class Token
