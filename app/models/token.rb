@@ -4,6 +4,10 @@ require 'json'
 class Token < ApplicationRecord
   # has_many :messages
 
+  def daysago(num)
+    (DateTime.now - num).strftime("%Y/%-m/%-d")
+  end
+
   def to_params
     {'refresh_token' => refresh_token,
     'client_id' => ENV['GOOGLE_CLIENT_ID'],
@@ -35,12 +39,13 @@ class Token < ApplicationRecord
   def login
     Token.clear_logins
     self.update(loggedin: true)
-    byebug
   end
 
-  def get_messages
+  def get_messages(daysago = 7, max_results = 500)
     puts "here we go"
     t1 = Time.now
+
+    after_date = daysago(daysago)
 
     # Initialize the API
     service = Google::Apis::GmailV1::GmailService.new
@@ -48,14 +53,17 @@ class Token < ApplicationRecord
     service.authorization = self.fresh_token
     user_id = "me"
 
+    
     next_page = nil
-    message_hashes = []
     error_counter = 0
     result_counter = 0
-
+    error_ids = []
+    messages_array = []
+    message_hashes = []
+  
     begin
       puts "Fetching page of emails"
-      result = service.list_user_messages(user_id, max_results: 500, page_token: next_page, q: "after:2019/12/22")
+      result = service.list_user_messages(user_id, max_results: max_results, page_token: next_page, q: "after:#{after_date}")
 
       # gather ID's for a batch
       ids = result.messages.map do |message| 
@@ -63,41 +71,64 @@ class Token < ApplicationRecord
       end
 
       service.batch do |service|
+        puts "batching ids"
         ids.each do |id|
           service.get_user_message(user_id, id, format: 'metadata') do |res, err|
             if err
               # Handle error
               # puts "Error"
+              error_ids << id
               error_counter += 1
             else
               # call to get messages. 100 per page
-              message_hashes << Message.make_message_hash(res, self)
+              messages_array << res
               result_counter += 1
             end
           end
         end
       end # service.batch
-      
+            
       next_page = result.next_page_token
     end while next_page
 
+
+
     t2 = Time.now
     delta = t2 - t1 
-
-    puts "#{result_counter} results"
+    
+    puts error_ids
     puts "#{error_counter} errors"
+    puts "#{result_counter} results"
     puts "#{delta} sec"
+    puts "BATCHING COMPLETE"
+    puts "---------------------------------"
 
-    message_hashes.map do |hash|
-      Message.new(hash)
+    return_array = messages_array.map do |message|
+      Message.new(Message.make_message_hash(message, self))
     end
 
+    t3 = Time.now
+    delta2 = t3 - t2
+    delta_total = t3 - t1
+    
+    puts "MESSAGE INITIALIZING COMPLETE"
+    puts "#{delta2} sec"
+    puts "---------------------------------"
+    puts "TOTAL FETCH: #{delta_total} sec"
+    puts "---------------------------------"
+
+
+    return_array
   end # def get_messages
+
+
 
   def self.clear_logins
     Token.all.each do |token|
       token.update(loggedin: nil)
     end
   end
+
+  
 
 end # class Token

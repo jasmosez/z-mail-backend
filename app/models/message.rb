@@ -14,6 +14,8 @@ class Message
     @date = attributes[:date]
     @subject = attributes[:subject]
     @from = attributes[:from]
+    @to = attributes[:to]
+    @message_id = attributes[:message_id]
     @snippet = attributes[:snippet]
     @labels = self.label_names.uniq
 
@@ -41,20 +43,37 @@ class Message
 
     # date
     message_hash[:date] = Time.at(message.internal_date/1000)
+    
     # id
     message_hash[:google_id] = message.id
+    
     # subject
     subject_header = message.payload.headers.find do |header|
-      header.name == "Subject"
+      header.name.downcase == "subject"
     end
-    message_hash[:subject] = subject_header.value
+    subject_header ? message_hash[:subject] = subject_header.value : message_hash[:subject] = ""
+    
     # from
     from_header = message.payload.headers.find do |header|    
-      header.name == "From"
+      header.name.downcase == "from"
     end
-    message_hash[:from] = from_header.value
+    from_header ? message_hash[:from] = from_header.value : message_hash[:from] = ""
+
+    # to
+    to_header = message.payload.headers.find do |header|    
+      header.name.downcase == "to"
+    end
+    to_header ? message_hash[:to] = to_header.value : message_hash[:to] = ""
+
+    # message_id
+    message_id_header = message.payload.headers.find do |header|    
+      header.name.downcase == "message-id"
+    end
+    message_id_header ? message_hash[:message_id] = message_id_header.value : message_hash[:message_id] = ""
+
     # description
     message_hash[:snippet] = message.snippet
+    
     # labels
     # in/out. Out is determined by having "SENT" within label_ids. In is everything that is not out.
     # inbox? determined by having "INBOX" within label_ids
