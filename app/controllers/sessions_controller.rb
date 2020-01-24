@@ -17,11 +17,12 @@ class SessionsController < ApplicationController
       )
     end
     
-    byebug
+    # byebug
     # set the current user to the found or newly created Token id
     
     user.login
     render plain: "You're all logged in and can close this tab. Current User: #{current_user.email}"
+    # render :js => "<script>alert('Hello Rails');</script>"
   end
 
   def destroy
