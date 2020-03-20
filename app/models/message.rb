@@ -77,9 +77,11 @@ class Message
     # labels
     # in/out. Out is determined by having "SENT" within label_ids. In is everything that is not out.
     # inbox? determined by having "INBOX" within label_ids
-    message.label_ids.each do |label_id|
-      Label.new(google_id: message.id, name: label_id)
-      # message_hash[:label_ids]
+    if !!message.label_ids
+      message.label_ids.each do |label_id|
+        Label.new(google_id: message.id, name: label_id)
+        # message_hash[:label_ids]
+      end  
     end
 
     # need to include a Token identifier of some sort. Could be the db ID. Could be somethign else?

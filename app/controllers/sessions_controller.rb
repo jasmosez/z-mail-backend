@@ -3,6 +3,7 @@ class SessionsController < ApplicationController
 
   def create
     # use authenticated email to check if we have a Token for that address
+    byebug
     email = request.env['omniauth.auth'].info.email
     user = Token.find_by(email: email)
     
