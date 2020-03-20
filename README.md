@@ -1,24 +1,33 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## OVERVIEW
+Z-mail is a tool to Visualize your Gmail in support of ‘Inbox Zero’ methodology
 
-Things you may want to cover:
+This backend is an API that pulls data from the Gmail API. You will need your own Google Client ID and Secret. 
 
-* Ruby version
+You will also need to use ngrok or some other way to tunnel out to the web from your local development server because Google won't accept localhost as an approved 'javascript origin' or 'redirect URI', each of which must be listed for the OAuth process. 
 
-* System dependencies
+The frontend can be found here: https://github.com/jasmosez/z-mail-frontend. It visualizes email throughput and inbox contents using c3.
 
-* Configuration
+## Ruby/Rails versions
+Uses Ruby 2.6.1 and Rails 6.0.2.1
 
-* Database creation
+## Configuration
+create `config/application.rb` file defining the following: 
 
-* Database initialization
+* `GOOGLE_CLIENT_ID`
+* `GOOGLE_CLIENT_SECRET`
 
-* How to run the test suite
+## Database creation
+### Migrate the database
+rails db:migrate
 
-* Services (job queues, cache servers, search engines, etc.)
+### Seed the database
+There is no need to seed the database -- 
+The backend grabs updated data from Gmail every time the app reloads
 
-* Deployment instructions
+## How to run the test suite
+There is not test coverage at this time
 
-* ...
+# Let me know what you think!
+Z-mail was built in collaboration with github.com/Zman613
