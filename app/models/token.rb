@@ -41,7 +41,7 @@ class Token < ApplicationRecord
     self.update(loggedin: true)
   end
 
-  def get_messages(daysago = 7, max_results = 500)
+  def get_messages(daysago = 30, max_results = 500)
     puts "here we go"
     t1 = Time.now
 

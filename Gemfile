@@ -41,8 +41,8 @@ end
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem 'google-api-client', '~> 0.34', require: 'google/apis/gmail_v1'
 gem 'omniauth-google-oauth2'
-gem 'devise'
-gem 'devise_token_auth', git: 'git://github.com/lynndylanhurley/devise_token_auth.git'
+# gem 'devise'
+# gem 'devise_token_auth', git: 'git://github.com/lynndylanhurley/devise_token_auth.git'
 gem 'json'
 gem 'dotenv'
 gem 'figaro'
