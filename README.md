@@ -30,4 +30,4 @@ The backend grabs updated data from Gmail every time the app reloads
 There is not test coverage at this time
 
 # Let me know what you think!
-Z-mail was built in collaboration with Zman613
+Z-mail was built in collaboration with [Zman613](https://github.com/zman613)
